@@ -1,13 +1,4 @@
-# bare-server-bun
-
-Installing:
-```bash
-npm install github:cohenerickson/bare-server-bun
-```
-
-Creating a bare server:
-```js
-import { BareServer } from "bare-server-bun";
+import { BareServer } from "./src/Server";
 
 const server = new BareServer({
   maintainer: {
@@ -20,4 +11,3 @@ server.listen(8080);
 
 console.log("Bare server Bun listening on port 8080");
 console.log("Press Ctrl+C to quit");
-```

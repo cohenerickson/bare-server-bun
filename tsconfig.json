@@ -11,8 +11,5 @@
     "strict": true,
     "allowJs": true,
     "types": ["bun-types"]
-  },
-  "include": [
-    "./src/"
-  ]
+  }
 }

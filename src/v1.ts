@@ -1,4 +1,4 @@
-import BareError from "./error";
+import BareError from "./BareError";
 
 // https://stackoverflow.com/a/106223/14635947
 const validateIpAddress = /^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$/;
@@ -15,53 +15,68 @@ export default async function v1 (request: Request): Promise<Response> {
 
   // Check if bare headers exist
   if (!host) {
-    return BareError("MISSING_BARE_HEADER", "request.headers.x-bare-host", "Header was not specified.");
+    throw new BareError("MISSING_BARE_HEADER", "request.headers.x-bare-host", "Header was not specified.");
   }
   if (!port) {
-    return BareError("MISSING_BARE_HEADER", "request.headers.x-bare-port", "Header was not specified.");
+    throw new BareError("MISSING_BARE_HEADER", "request.headers.x-bare-port", "Header was not specified.");
   }
   if (!protocol) {
-    return BareError("MISSING_BARE_HEADER", "request.headers.x-bare-protocol", "Header was not specified.");
+    throw new BareError("MISSING_BARE_HEADER", "request.headers.x-bare-protocol", "Header was not specified.");
   }
   if (!path) {
-    return BareError("MISSING_BARE_HEADER", "request.headers.x-bare-path", "Header was not specified.");
+    throw new BareError("MISSING_BARE_HEADER", "request.headers.x-bare-path", "Header was not specified.");
   }
   if (!headers) {
-    return BareError("MISSING_BARE_HEADER", "request.headers.x-bare-headers", "Header was not specified.");
+    throw new BareError("MISSING_BARE_HEADER", "request.headers.x-bare-headers", "Header was not specified.");
   }
   if (!forwardHeaders) {
-    return BareError("MISSING_BARE_HEADER", "request.headers.x-bare-forward-headers", "Header was not specified.");
+    throw new BareError("MISSING_BARE_HEADER", "request.headers.x-bare-forward-headers", "Header was not specified.");
   }
 
   // Validate bare headers
   if (!validateIpAddress.test(host) && !validateHostname.test(host)) {
-    return BareError("INVALID_BARE_HEADER", "request.headers.x-bare-host", "Header contained an unparsable/invalid value.");
+    throw new BareError("INVALID_BARE_HEADER", "request.headers.x-bare-host", "Header contained an unparsable/invalid value.");
   }
   if (!(parseInt(port) > 0)) {
-    return BareError("INVALID_BARE_HEADER", "request.headers.x-bare-port", "Header contained an unparsable/invalid value.");
+    throw new BareError("INVALID_BARE_HEADER", "request.headers.x-bare-port", "Header contained an unparsable/invalid value.");
   }
   if (!/^https?:$/.test(protocol)) {
-    return BareError("INVALID_BARE_HEADER", "request.headers.x-bare-protocol", "Header contained an unparsable/invalid value.");
+    throw new BareError("INVALID_BARE_HEADER", "request.headers.x-bare-protocol", "Header contained an unparsable/invalid value.");
   }
   if (!/^\/[/.a-zA-Z0-9-?&=#%]*$/.test(path)) {
-    return BareError("INVALID_BARE_HEADER", "request.headers.x-bare-path", "Header contained an unparsable/invalid value.");
+    throw new BareError("INVALID_BARE_HEADER", "request.headers.x-bare-path", "Header contained an unparsable/invalid value.");
   }
   try { JSON.parse(headers);} catch {
-    return BareError("INVALID_BARE_HEADER", "request.headers.x-bare-headers", "Header contained an unparsable/invalid value.");
+    throw new BareError("INVALID_BARE_HEADER", "request.headers.x-bare-headers", "Header contained an unparsable/invalid value.");
   }
   try { JSON.parse(forwardHeaders); } catch {
-    return BareError("INVALID_BARE_HEADER", "request.headers.x-bare-forward-headerss", "Header contained an unparsable/invalid value.");
+    throw new BareError("INVALID_BARE_HEADER", "request.headers.x-bare-forward-headerss", "Header contained an unparsable/invalid value.");
   }
 
-  const bareFetchURL = new URL(`${protocol}//${host}:${port}${path}`);
-
+  let bareFetchURL;
+  try {
+    bareFetchURL = new URL(`${protocol}//${host}:${port}${path}`);
+  } catch (err: any) {
+    throw err;
+  }
+  
   let fetchData: RequestInit = {
     method: request.method,
     headers: JSON.parse(headers)
   }
   if (!["GET", "HEAD"].includes(request.method)) fetchData.body = await request.blob();
+  
+  let response;
+  try {
+    response = await fetch(bareFetchURL.toString(), fetchData);
+  } catch (err: any) {
+    if (/UnknownHostName/.test(err.message)) throw new BareError("HOST_NOT_FOUND", "response", "The hostname could not be resolved.", err.stack);
+    if (/ConnectionReset/.test(err.message)) throw new BareError("CONNECTION_RESET", "response", "The connection was reset.", err.stack);  
+    if (/ConnectionRefused/.test(err.message)) throw new BareError("CONNECTION_REFUSED", "response", "The connection was refused.", err.stack);
+    if (/ConnectionTimeout/.test(err.message)) throw new BareError("CONNECTION_TIMEOUT", "response", "The connection timed out.", err.stack);
+    throw err;
+  }
 
-  const response = await fetch(bareFetchURL.toString(), fetchData);
   const responseData = await response.blob();
 
   return new Response(responseData, {
