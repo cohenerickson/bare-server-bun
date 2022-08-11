@@ -1,0 +1,11 @@
+{
+  "name": "bare-server-bun",
+  "module": "src/index.ts",
+  "type": "module",
+  "scripts": {
+    "start": "bun src/index.ts"
+  },
+  "devDependencies": {
+    "bun-types": "^0.1.5"
+  }
+}
