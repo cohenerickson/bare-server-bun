@@ -90,6 +90,11 @@ export default async function upgradeWs(request: Request): Promise<Response> {
           /* Websocket response headers */
         }
       });
+      setTimeout(() => {
+        if (WsMeta.has(protocol.id)) {
+          WsMeta.delete(protocol.id);
+        }
+      }, 1000 * 30);
     }
   }
 

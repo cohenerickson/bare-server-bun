@@ -56,16 +56,13 @@ export default async function wsMeta(request: Request): Promise<Response> {
     End Validate Headers
   */
 
-  return new Response(
-    JSON.stringify(
-      WsMeta.get(request.headers.get("X-Bare-ID") ?? "") ?? {},
-      null,
-      2
-    ),
-    {
-      headers: {
-        "content-type": "application/json"
-      }
+  const meta = WsMeta.get(request.headers.get("X-Bare-ID") ?? "") ?? {};
+
+  WsMeta.delete(request.headers.get("X-Bare-ID") ?? "");
+
+  return new Response(JSON.stringify(meta, null, 2), {
+    headers: {
+      "content-type": "application/json"
     }
-  );
+  });
 }
