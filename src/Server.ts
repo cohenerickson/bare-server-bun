@@ -1,15 +1,18 @@
-import { memoryUsage } from "bun:jsc";
-import { ServerOptions } from "./types/ServerOptions";
-import v1 from "./v1";
-import v2 from "./v2";
+import ServerOptions from "~/types/ServerOptions";
+import HandleRoot from "./routes/root";
+import HandleV1 from "./routes/v1";
+import HandleV2 from "./routes/v2";
+import global from "~/global";
+import BareError from "./util/BareError";
 
 export class BareServer {
   options: ServerOptions = {};
-  constructor (options: ServerOptions = {}) {
+  constructor(options: ServerOptions = {}) {
+    global.options = options;
     this.options = options;
   }
 
-  listen (port: number): void {
+  listen(port: number): void {
     Bun.serve({
       port,
       fetch: this.fetch.bind(this),
@@ -17,48 +20,37 @@ export class BareServer {
     });
   }
 
-  async fetch (request: Request): Promise<Response> {
+  async fetch(request: Request): Promise<Response> {
     const url = new URL(request.url);
-  
-    if (url.pathname.startsWith("/v1")) {
-      return await v1(request);
-    } else if (url.pathname.startsWith("/v2")) {
-      return await v2(request);
+
+    if (global.options.logLevel ?? 0 > 1) {
+      console.debug(request.method, url.pathname);
     }
-    
-    return new Response(JSON.stringify({
-      versions: [
-        "v1",
-        "v2"
-      ],
-      language: "Bun",
-      memoryUsage: parseFloat((memoryUsage().current / 8000000).toFixed(2)),
-      maintainer: this.options.maintainer,
-      project: {
-        name: "bare-server-bun",
-        description: "TOMP bare server implementation using Bun.",
-        email: "cohenerickson@gmail.com",
-        repository: "https://github.com/cohenerickson/bare-server-bun.git"
-      }
-    }, null, 2), {
-      status: 200,
+
+    if (/^\/?$/.test(url.pathname)) {
+      return await HandleRoot(request, this.options);
+    } else if (/^\/v1\/?$/.test(url.pathname)) {
+      return await HandleV1(request, this.options);
+    } else if (/^\/v2\/?$/.test(url.pathname)) {
+      return await HandleV2(request, this.options);
+    }
+
+    return new Response("Not found", {
+      status: 404,
       headers: {
-        "Content-Type": "application/json"
+        "Content-Type": "text/plain"
       }
     });
   }
 
-  error (error: any): Response {
-    return new Response(JSON.stringify({
-      code: error.code || "UNKNOWN",
-      id: error.id || "error",
+  async error(error: Error): Promise<Response> {
+    if (global.options.logLevel ?? 0 > 0) {
+      console.error(error);
+    }
+
+    return new BareError(BareError.UNKNOWN, `error.${error.name}`, {
       message: error.message,
       stack: error.stack
-    }, null, 2), {
-      status: error.status || 500,
-      headers: {
-        "Content-Type": "application/json"
-      }
     });
   }
 }

@@ -10,6 +10,9 @@
     "inlineSources": true,
     "strict": true,
     "allowJs": true,
-    "types": ["bun-types"]
+    "types": ["bun-types"],
+    "paths": {
+      "~/*": ["./src/*"]
+    }
   }
 }
