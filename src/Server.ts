@@ -29,9 +29,9 @@ export class BareServer {
 
     if (/^\/?$/.test(url.pathname)) {
       return await HandleRoot(request, this.options);
-    } else if (/^\/v1\/?$/.test(url.pathname)) {
+    } else if (/^\/v1\/?/.test(url.pathname)) {
       return await HandleV1(request, this.options);
-    } else if (/^\/v2\/?$/.test(url.pathname)) {
+    } else if (/^\/v2\/?/.test(url.pathname)) {
       return await HandleV2(request, this.options);
     }
 

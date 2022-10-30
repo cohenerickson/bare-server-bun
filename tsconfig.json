@@ -5,6 +5,7 @@
     "target": "esnext",
     "moduleResolution": "node",
     "resolveJsonModule": true,
+    "allowSyntheticDefaultImports": true,
     "outDir": "./dist",
     "sourceMap": true,
     "inlineSources": true,
