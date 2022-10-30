@@ -1,5 +1,5 @@
 import { heapStats } from "bun:jsc";
-import { ServerOptions } from "../../types/ServerOptions";
+import ServerOptions from "~/types/ServerOptions";
 import * as packageJSON from "../../../package.json";
 
 export default async function Root(

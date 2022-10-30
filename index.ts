@@ -2,7 +2,7 @@ import { BareServer } from "./src/Server";
 
 const server = new BareServer({
   maintainer: {
-    email: "cohenerickson@gmail.com",
+    email: "contact@cohenerickson.com",
     website: "https://cohenerickson.com/"
   },
   logLevel: 2,

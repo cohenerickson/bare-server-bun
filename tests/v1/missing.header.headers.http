@@ -1,0 +1,6 @@
+GET http://localhost:8080/v1/
+X-Bare-Host: example.com
+X-Bare-Port: 80
+X-Bare-Protocol: https:
+X-Bare-Path: /
+X-Bare-Forward-Headers: ["accept-encoding", "accept-language"]
