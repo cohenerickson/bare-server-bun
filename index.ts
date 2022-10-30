@@ -4,9 +4,7 @@ const server = new BareServer({
   maintainer: {
     email: "contact@cohenerickson.com",
     website: "https://cohenerickson.com/"
-  },
-  logLevel: 2,
-  stackTrace: true
+  }
 });
 
 server.listen(8080);

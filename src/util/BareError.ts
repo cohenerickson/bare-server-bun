@@ -1,4 +1,3 @@
-import global from "~/global";
 import ErrorObject from "~/types/ErrorObject";
 
 type ErrorType = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9;
@@ -15,16 +14,9 @@ export default class BareError extends Response {
     const error: ErrorObject = {
       code: BareError.ErrorCodes[type],
       id: id,
-      message: extras?.message ?? BareError.ErrorMessages[type]
+      message: extras?.message ?? BareError.ErrorMessages[type],
+      stack: extras?.stack ?? new Error().stack
     };
-
-    if (global.options.stackTrace) {
-      error.stack = extras?.stack ?? new Error().stack;
-    }
-
-    if (global.options.logLevel ?? 0 > 0) {
-      console.error("ERROR", error);
-    }
 
     super(JSON.stringify(error, null, 2), {
       status: BareError.ErrorStatuses[type],
