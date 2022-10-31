@@ -1,6 +1,9 @@
 import BareError from "~/util/BareError";
+import httpRequest from "~/util/HttpRequest";
 
-export default async function handleHttpRequest(request: Request): Promise<Response> {
+export default async function handleHttpRequest(
+  request: Request
+): Promise<Response> {
   /*
     Start Validate Headers
   */
@@ -10,7 +13,8 @@ export default async function handleHttpRequest(request: Request): Promise<Respo
       "X-Bare-Port",
       "X-Bare-Protocol",
       "X-Bare-Path",
-      "X-Bare-Headers"
+      "X-Bare-Headers",
+      "X-Bare-Forward-Headers"
     ];
 
     for (let i = 0; i < requiredHeaders.length; i++) {
@@ -76,28 +80,12 @@ export default async function handleHttpRequest(request: Request): Promise<Respo
           }
           break;
         case "X-Bare-Forward-Headers":
-          const disallowedHeaders = [
-            "vary",
-            "connection",
-            "transfer-encoding",
-            "access-control-allow-headers",
-            "access-control-allow-methods",
-            "access-control-expose-headers",
-            "access-control-max-age",
-            "access-control-request-headers",
-            "access-control-request-method"
-          ];
           try {
             const json = JSON.parse(
-              request.headers.get(requiredHeaders[i]) as string
+              request.headers.get(requiredHeaders[i]) ?? ""
             );
 
             if (!Array.isArray(json)) throw new Error();
-            for (let i = 0; i < disallowedHeaders.length; i++) {
-              if (json.includes(disallowedHeaders[i])) {
-                throw new Error();
-              }
-            }
           } catch {
             return new BareError(
               BareError.INVALID_BARE_HEADER,
@@ -126,6 +114,38 @@ export default async function handleHttpRequest(request: Request): Promise<Respo
             BareError.UNKNOWN_BARE_HEADER,
             `request.headers.${requestHeadersKeys[i]}`
           );
+        } else if (
+          requestHeadersKeys[i].toLowerCase() === "x-bare-pass-headers"
+        ) {
+          const disallowedHeaders = [
+            "vary",
+            "connection",
+            "transfer-encoding",
+            "access-control-allow-headers",
+            "access-control-allow-methods",
+            "access-control-expose-headers",
+            "access-control-max-age",
+            "access-control-request-headers",
+            "access-control-request-method"
+          ];
+          try {
+            let json = JSON.parse(
+              request.headers.get(requestHeadersKeys[i]) as string
+            );
+
+            if (!Array.isArray(json)) throw new Error();
+            json = json.map((x: string): string => x.toLowerCase());
+            for (let i = 0; i < disallowedHeaders.length; i++) {
+              if (json.includes(disallowedHeaders[i])) {
+                throw new Error();
+              }
+            }
+          } catch {
+            return new BareError(
+              BareError.INVALID_BARE_HEADER,
+              `request.headers.${requiredHeaders[i]}`
+            );
+          }
         }
       }
     }
@@ -134,7 +154,5 @@ export default async function handleHttpRequest(request: Request): Promise<Respo
     End Validate Headers
   */
 
-  return new BareError(BareError.UNKNOWN, "unknown", {
-    message: "Not implemented."
-  });
+  return await httpRequest(request);
 }
