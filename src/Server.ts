@@ -21,9 +21,6 @@ export class BareServer {
   async fetch(request: Request): Promise<Response> {
     const url = new URL(request.url);
 
-    // DEBUG: Uncomment this to see incoming requests.
-    console.debug(request.method, url.pathname);
-
     if (/^\/?$/.test(url.pathname)) {
       return await HandleRoot(request, this.options);
     } else if (/^\/v1\/?/.test(url.pathname)) {

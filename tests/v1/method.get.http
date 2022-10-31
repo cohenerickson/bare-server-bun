@@ -1,5 +1,5 @@
 GET http://localhost:8080/v1/
-X-Bare-Host: example.com
+X-Bare-Host: youtube.com
 X-Bare-Port: 443
 X-Bare-Protocol: https:
 X-Bare-Path: /

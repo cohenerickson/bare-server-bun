@@ -1,5 +1,7 @@
 import BareError from "~/util/BareError";
-import httpRequest from "~/util/HttpRequest";
+import httpRequest from "~/util/httpRequest";
+import passHeaders from "~/util/passHeaders";
+import passStatus from "~/util/passStatus";
 
 export default async function handleHttpRequest(
   request: Request
@@ -154,5 +156,37 @@ export default async function handleHttpRequest(
     End Validate Headers
   */
 
-  return await httpRequest(request);
+  const response: Response = await httpRequest({
+    protocol: request.headers.get("X-Bare-Protocol") ?? "",
+    host: request.headers.get("X-Bare-Host") ?? "",
+    port: request.headers.get("X-Bare-Port") ?? "",
+    path: request.headers.get("X-Bare-Path") ?? "",
+    method: request.method,
+    headers: passHeaders(
+      request.headers.get("X-Bare-Forward-Headers") ?? "",
+      request.headers
+    )
+  });
+
+  if (response instanceof BareError) {
+    return response;
+  } else {
+    return new Response((<Response & { body?: any }>response).body, {
+      status: passStatus(
+        request.headers.get("X-Bare-Pass-Status") ?? "",
+        response.status
+      ),
+      headers: {
+        "Content-Encoding": response.headers.get("Content-Encoding") ?? "",
+        "X-Bare-Status": response.status.toString(),
+        "X-Bare-Status-Text": response.statusText,
+        "X-Bare-Headers":
+          JSON.stringify(Object.fromEntries(response.headers as any)) ?? "{}",
+        ...passHeaders(
+          request.headers.get("X-Bare-Pass-Headers") ?? "",
+          response.headers
+        )
+      }
+    });
+  }
 }
