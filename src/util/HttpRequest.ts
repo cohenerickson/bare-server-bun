@@ -1,5 +1,6 @@
 import BareError from "./BareError";
-import passHeaders from "./PassHeaders";
+import passHeaders from "./passHeaders";
+import passStatus from "./passStatus";
 
 export default function httpRequest(
   incomingRequest: Request
@@ -24,11 +25,30 @@ export default function httpRequest(
       headers: options.headers
     })
       .then((response: Response): void => {
-        // TODO: Handle response according to bare spec
-        resolve(response);
+        console.log(response.status);
+        // @ts-ignore - TS doesn't think that body exists on Response
+        const res = new Response(response.body, {
+          status: passStatus(
+            incomingRequest.headers.get("X-Bare-Pass-Status") ?? "",
+            response.status
+          ),
+          headers: {
+            "Content-Encoding": response.headers.get("Content-Encoding") ?? "",
+            "X-Bare-Status": response.status.toString(),
+            "X-Bare-Status-Text": response.statusText,
+            "X-Bare-Headers":
+              JSON.stringify(Object.fromEntries(response.headers as any)) ??
+              "{}",
+            ...passHeaders(
+              incomingRequest.headers.get("X-Bare-Pass-Headers") ?? "",
+              response.headers
+            )
+          }
+        });
+        resolve(res);
+        //resolve(response);
       })
       .catch((error: Error) => {
-        console.log((error as any).code)
         switch ((<Error & { code?: string }>error).code) {
           case "ENOTFOUND":
             resolve(
@@ -72,21 +92,5 @@ export default function httpRequest(
             );
         }
       });
-
-    // resolve(
-    //   new Response(parsedBody, {
-    //     status: 200,
-    //     headers: {
-    //       "Content-Encoding": response.headers["content-encoding"] ?? "",
-    //       "X-Bare-Status": response.statusCode?.toString() ?? "200",
-    //       "X-Bare-Status-Text": response.statusMessage ?? "OK",
-    //       "X-Bare-Headers": JSON.stringify(response.headers) ?? "{}",
-    //       ...passHeaders(
-    //         incomingRequest.headers.get("X-Bare-Pass-Headers") ?? "{}",
-    //         response.headers
-    //       )
-    //     }
-    //   })
-    // );
   });
 }
