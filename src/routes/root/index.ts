@@ -16,7 +16,8 @@ export default async function Root(
         maintainer: options.maintainer,
         project: {
           name: "bare-server-bun",
-          description: "TOMP bare server implementation using Bun",
+          description:
+            "TOMP bare server implementation using native Bun API's.",
           email: "contact@cohenerickson.com",
           website: "https://cohenerickson.com",
           repository: "https://github.com/cohenerickson/bare-server-bun.git",
