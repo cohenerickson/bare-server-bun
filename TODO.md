@@ -1,0 +1,3 @@
+- Restructure tests using jest
+- v1 websocket connections
+- v2 API
