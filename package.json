@@ -15,7 +15,7 @@
   "type": "module",
   "main": "src/index.ts",
   "scripts": {
-    "start": "bun index.ts",
+    "start": "bun examples/basic.ts",
     "build": "tsc"
   },
   "devDependencies": {

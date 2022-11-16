@@ -4,10 +4,16 @@ import HandleV1 from "./routes/v1";
 import HandleV2 from "./routes/v2";
 import BareError from "./util/BareError";
 
-export class BareServer {
+export default class BareServer {
   options: ServerOptions = {};
-  constructor(options: ServerOptions = {}) {
+  route: string = "/";
+  constructor(route: string, options: ServerOptions = {}) {
     this.options = options;
+    this.route = route;
+  }
+
+  shouldRoute(request: Request): boolean {
+    return new URL(request.url).pathname.startsWith(this.route);
   }
 
   listen(port: number): void {
@@ -18,14 +24,16 @@ export class BareServer {
     });
   }
 
-  async fetch(request: Request): Promise<Response> {
-    const url = new URL(request.url);
+  async handleRoute(request: Request): Promise<Response> {
+    let path = new URL(request.url).pathname.substring(this.route.length);
 
-    if (/^\/?$/.test(url.pathname)) {
+    if (!/^\//.test(path)) path = `/${path}`;
+
+    if (/^\/?$/.test(path)) {
       return await HandleRoot(request, this.options);
-    } else if (/^\/v1\/?/.test(url.pathname)) {
+    } else if (/^\/v1\/?/.test(path)) {
       return await HandleV1(request);
-    } else if (/^\/v2\/?/.test(url.pathname)) {
+    } else if (/^\/v2\/?/.test(path)) {
       return await HandleV2(request);
     }
 
@@ -35,6 +43,10 @@ export class BareServer {
         "Content-Type": "text/plain"
       }
     });
+  }
+
+  async fetch(request: Request): Promise<Response> {
+    return await this.handleRoute(request);
   }
 
   async error(error: Error): Promise<Response> {

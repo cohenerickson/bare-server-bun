@@ -1,13 +1,13 @@
-import { BareServer } from "./src/Server";
+import BareServer from "~/index";
 
-const server = new BareServer({
+const bareServer = new BareServer("/", {
   maintainer: {
     email: "contact@cohenerickson.com",
-    website: "https://cohenerickson.com/"
+    website: "https://cohenerickson.com"
   }
 });
 
-server.listen(8080);
+bareServer.listen(8080);
 
 console.log("Bare server Bun listening on port 8080");
 console.log("Press Ctrl+C to quit");
