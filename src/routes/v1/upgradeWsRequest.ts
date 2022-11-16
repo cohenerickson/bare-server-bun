@@ -1,8 +1,10 @@
 import BareError from "~/util/BareError";
-import WsMeta from "./WsMeta";
 import { decodeProtocol, validateProtocol } from "~/util/encodeProtocol";
 
-export default async function upgradeWs(request: Request): Promise<Response> {
+export default async function upgradeWs(
+  request: Request,
+  server: any
+): Promise<Response | void> {
   if (request.method !== "GET") {
     return new BareError(BareError.UNKNOWN, "request.method", {
       message: "Invalid request method."
@@ -77,28 +79,13 @@ export default async function upgradeWs(request: Request): Promise<Response> {
     End Validate Headers
   */
 
-  const protocol = JSON.parse(
-    decodeProtocol(
-      request.headers.get("Sec-WebSocket-Protocol")?.split(/, ?/)[1] ?? ""
-    )
-  );
-
-  if (protocol.id) {
-    if (!WsMeta.has(protocol.id)) {
-      WsMeta.set(protocol.id, {
-        headers: {
-          /* Websocket response headers */
-        }
-      });
-      setTimeout(() => {
-        if (WsMeta.has(protocol.id)) {
-          WsMeta.delete(protocol.id);
-        }
-      }, 1000 * 30);
-    }
-  }
-
-  return new BareError(BareError.UNKNOWN, "unknown", {
-    message: "Not implemented."
-  });
+  if (
+    server.upgrade(request, {
+      data: {
+        headers: Object.fromEntries(request.headers as any),
+        url: request.url
+      }
+    })
+  )
+    return;
 }
