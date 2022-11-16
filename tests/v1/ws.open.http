@@ -1,3 +1,0 @@
-GET http://localhost:8080/v1/
-Upgrade: websocket
-Sec-WebSocket-Protocol: bare, %7b%22remote%22%3a%7b%22host%22%3a%22example.com%22%2c%22port%22%3a80%2c%22path%22%3a%22%2fws%22%2c%22protocol%22%3a%22ws%3a%22%7d%2c%22headers%22%3a%7b%22Origin%22%3a%22http%3a%2f%2fexample.org%22%2c%22Sec-WebSocket-Protocol%22%3a%22original_websocket_protocol%22%7d%2c%22forward_headers%22%3a%5b%22accept-encoding%22%2c%22accept-language%22%2c%22sec-websocket-extensions%22%2c%22sec-websocket-key%22%2c%22sec-websocket-version%22%5d%2c%22id%22%3a%22c918e5f4bf1b1a94e1798c3deaa93299112e4e10554ec0860ac28667ee916d91%22%7d

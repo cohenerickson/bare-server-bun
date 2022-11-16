@@ -1,32 +1,20 @@
 {
-	"name": "Bun (Bullseye)",
-	"build": {
-		"dockerfile": "Dockerfile"
-	},
-	
+  "name": "Bun (Bullseye)",
+  "build": {
+    "dockerfile": "Dockerfile"
+  },
+
   "workspaceMount": "src=${localWorkspaceFolder},dst=/workspace,type=bind,consistency=cached",
   "workspaceFolder": "/workspace",
-	
-	"forwardPorts": [8080],
 
-	"extensions": [
-		"akamud.vscode-theme-onedark",
-		"zamerick.vscode-caddyfile-syntax",
-		"erikpukinskis.chrome-codespaces-keymap",
-		"mikestead.dotenv",
-		"DigitalBrainstem.javascript-ejs-support",
-		"dbaeumer.vscode-eslint",
-		"eamodio.gitlens",
-		"wix.vscode-import-cost",
-		"bierner.markdown-preview-github-styles",
-		"PKief.material-icon-theme",
-		"esbenp.prettier-vscode",
-		"humao.rest-client",
-		"bernardogualberto.solidjs",
-		"solidjs-community.solid-snippets"
-	],
+  "forwardPorts": [8080],
 
-	"postCreateCommand": "bun install",
+  "extensions": ["dbaeumer.vscode-eslint", "esbenp.prettier-vscode"],
 
-	"remoteUser": "vscode"
+  "postCreateCommand": "bun install",
+
+  "remoteUser": "vscode",
+  "features": {
+    "ghcr.io/devcontainers/features/node:1": {}
+  }
 }

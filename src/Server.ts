@@ -48,12 +48,13 @@ export default class BareServer {
       return await HandleV2(request, server);
     }
 
-    return new Response("Not found", {
-      status: 404,
-      headers: {
-        "Content-Type": "text/plain"
+    return new BareError(
+      BareError.UNKNOWN,
+      `request.url`,
+      {
+        message: "Not found."
       }
-    });
+    );
   }
 
   async fetch(request: Request, server: any): Promise<Response | void> {
