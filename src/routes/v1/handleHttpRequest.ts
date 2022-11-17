@@ -37,7 +37,7 @@ export default async function handleHttpRequest(
           break;
         case "X-Bare-Port":
           const number = Number(request.headers.get(requiredHeaders[i]));
-          if (isNaN(number)) {
+          if (isNaN(number) || !request.headers.get(requiredHeaders[i])) {
             return new BareError(
               BareError.INVALID_BARE_HEADER,
               `request.headers.${requiredHeaders[i]}`
