@@ -73,7 +73,8 @@ export default async function handleHttpRequest(
               request.headers.get(requiredHeaders[i]) ?? ""
             );
 
-            if (Array.isArray(json)) throw new Error();
+            if (!json || Array.isArray(json))
+              throw new Error();
           } catch {
             return new BareError(
               BareError.INVALID_BARE_HEADER,

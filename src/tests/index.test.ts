@@ -30,7 +30,6 @@ test('"/v1" with all headers', async () => {
 test.each(requiredHeaders)(
   '"/v1" with invalid "%s" header',
   async (header: string) => {
-    console.log(Object.assign({}, testHeaders, { [header]: "" }));
     const response: Response = await fetch(location.origin + "/v1", {
       headers: Object.assign({}, testHeaders, { [header]: "" })
     });
@@ -47,7 +46,6 @@ test.each(requiredHeaders)(
 test.each(requiredHeaders)(
   '"/v1" with missing "%s" header',
   async (header: string) => {
-    console.log(Object.assign({}, testHeaders, { [header]: "" }));
     const headers: { [key: string]: string } = Object.assign({}, testHeaders);
     delete headers[header];
     const response: Response = await fetch(location.origin + "/v1", {
