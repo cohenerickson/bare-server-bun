@@ -51,7 +51,7 @@ export default async function handleHttpRequest(
           break;
         case "X-Bare-Protocol":
           if (
-            !/^(http|ws)s:$/.test(request.headers.get("X-Bare-Protocol") ?? "")
+            !/^(http|ws)s?:$/.test(request.headers.get("X-Bare-Protocol") ?? "")
           ) {
             return new BareError(
               BareError.INVALID_BARE_HEADER,
