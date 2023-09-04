@@ -3,17 +3,10 @@
     "lib": ["ESNext"],
     "module": "esnext",
     "target": "esnext",
-    "moduleResolution": "node",
-    "resolveJsonModule": true,
-    "allowSyntheticDefaultImports": true,
-    "outDir": "./dist",
-    "sourceMap": true,
-    "inlineSources": true,
+    "moduleResolution": "Bundler",
     "strict": true,
-    "allowJs": true,
-    "types": ["bun-types", "jest"],
-    "paths": {
-      "~/*": ["./src/*"]
-    }
-  }
+    "allowSyntheticDefaultImports": true,
+    "types": ["bun-types"]
+  },
+  "include": ["./src/**/*"]
 }

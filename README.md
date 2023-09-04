@@ -1,25 +1,15 @@
 # bare-server-bun
 
-Installing:
+To install dependencies:
 
 ```bash
-npm install github:cohenerickson/bare-server-bun
+bun install
 ```
 
-Creating a bare server:
+To run:
 
-```js
-import BareServer from "bare-server-bun";
-
-const bareServer = new BareServer("/", {
-  maintainer: {
-    email: "contact@cohenerickson.com",
-    website: "https://cohenerickson.com"
-  }
-});
-
-bareServer.listen(8080);
-
-console.log("Bare server Bun listening on port 8080");
-console.log("Press Ctrl+C to quit");
+```bash
+bun run index.ts
 ```
+
+This project was created using `bun init` in bun v0.8.1. [Bun](https://bun.sh) is a fast all-in-one JavaScript runtime.
